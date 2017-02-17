@@ -3,6 +3,7 @@ from decimal import Decimal, getcontext
 
 getcontext().prec = 30
 
+
 class Vector(object):
     def __init__(self, coordinates):
         try:
@@ -17,10 +18,8 @@ class Vector(object):
         except TypeError:
             raise TypeError('The coordinates must be an iterable')
 
-
     def __str__(self):
         return 'Vector: {}'.format(self.coordinates)
-
 
     def __eq__(self, v):
         return self.coordinates == v.coordinates
@@ -46,7 +45,7 @@ class Vector(object):
             return Vector([Decimal(v_or_s) * x for x in self.coordinates])
 
     def magnitude(self):
-        squares = [x**2 for x in self.coordinates]
+        squares = [x**Decimal(2.0) for x in self.coordinates]
         mag_squared = sum(squares) # reduce(lambda x,y:x+y, squares)
         return Decimal(math.sqrt(mag_squared))
 
@@ -56,13 +55,27 @@ class Vector(object):
         return self.__mul__(Decimal('1.0')/mag)
 
     def dot(self, v):
-        return sum([a*b for a,b in zip(self.coordinates, v.coordinates)])
+        return Decimal(sum([a*b for a,b in zip(self.coordinates, v.coordinates)]))
 
     def angle_rad(self, v):
         # arg = self.dot(v) / (self.magnitude() * v.magnitude())
         arg = self.normalization().dot(v.normalization())
-        return math.acos(arg)
+        arg_bounded = min(1,max(arg,-1))
+        return math.acos(arg_bounded)
 
     def angle_degrees(self, v):
         rads = self.angle_rad(v)
         return math.degrees(rads)
+
+    def is_parallel(self, v, tolerance=0.001):
+        return (self.is_zero_vector() or
+                v.is_zero_vector() or
+                (abs(self.angle_degrees(v)) < tolerance) or
+                (180 + tolerance > self.angle_degrees(v) > 180-tolerance)
+                )
+
+    def is_zero_vector(self, tolerance=0.001):
+        return self.magnitude() < tolerance
+
+    def is_orthogonal(self, v, tolerance=0.001):
+        return abs(self.dot(v)) < tolerance
