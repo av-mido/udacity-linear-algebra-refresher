@@ -79,3 +79,11 @@ class Vector(object):
 
     def is_orthogonal(self, v, tolerance=0.001):
         return abs(self.dot(v)) < tolerance
+
+    def projection(self, b):
+        b_normalized = b.normalization()
+        return self.dot(b_normalized) * b_normalized
+
+    def projection_orthogonal(self, b):
+        proj = self.projection(b)
+        return self - proj
