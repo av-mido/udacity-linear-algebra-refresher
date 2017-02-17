@@ -87,3 +87,19 @@ class Vector(object):
     def projection_orthogonal(self, b):
         proj = self.projection(b)
         return self - proj
+
+    def cross_product(self, w):
+        # r1 = self.coordinates[1] * w.coordinates[2] - w.coordinates[1] * self.coordinates[2]
+        # r2 = -1 * self.coordinates[0] * w.coordinates[2] + w.coordinates[0] * self.coordinates[2]
+        # r3 = self.coordinates[0] * w.coordinates[1] - w.coordinates[0] * self.coordinates[1]
+        x1, y1, z1 = self.coordinates
+        x2, y2, z2 = w.coordinates
+        r_coords = [y1*z2 - y2*z1, -1*x1*z2 + x2*z1, x1*y2 - x2*y1]
+        return Vector(r_coords)
+
+    def area_parallelogram(self, w):
+        r = self.cross_product(w)
+        return r.magnitude()
+
+    def area_half_triangle(self, w):
+        return self.area_parallelogram(w) / Decimal(2.0)
