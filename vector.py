@@ -103,3 +103,9 @@ class Vector(object):
 
     def area_half_triangle(self, w):
         return self.area_parallelogram(w) / Decimal(2.0)
+
+    def __iter__(self):
+        return iter(self.coordinates)
+
+    def __getitem__(self, key):
+        return self.coordinates[key]
