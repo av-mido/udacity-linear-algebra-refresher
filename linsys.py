@@ -40,6 +40,47 @@ class LinearSystem(object):
         new_constant = self[row_to_be_added_to].constant_term + plane_times_coef.constant_term
         self[row_to_be_added_to] = Plane(new_normal, new_constant)
 
+    def compute_triangular_form(self):
+        system = deepcopy(self)
+        # cur_col_idx = 0
+        # for cur_row_idx in range(0, len(system.planes)):
+        #     cur_row_col_val = system.planes[cur_row_idx].normal_vector[cur_col_idx]
+        #     if cur_row_col_val == 0:
+        #         for potential_swap_idx in range(cur_row_idx+1, len(system.planes)):
+        #             potential_row_col_val = system.planes[potential_swap_idx].normal_vector[cur_col_idx]
+        #             if potential_row_col_val != 0:
+        #                 system.swap_rows(cur_row_idx, potential_swap_idx)
+        for cur_row_idx in range(0, len(system.planes)):
+            self.swap_if_necessary(cur_row_idx, system)
+
+            if system.planes[cur_row_idx].normal_vector.is_zero_vector():
+                return system
+
+            # Do row subtractions
+            first_nonzero_col = Plane.first_nonzero_index(system.planes[cur_row_idx].normal_vector)
+            # print(cur_row_idx, ': ', first_nonzero_col)
+            for below_row in range(cur_row_idx+1, len(system.planes)):
+                a = system.planes[cur_row_idx].normal_vector[first_nonzero_col]
+                b = system.planes[below_row].normal_vector[first_nonzero_col]
+                coef = -b/a
+                system.add_multiple_times_row_to_row(coef, cur_row_idx, below_row)
+
+
+        return system
+
+    def swap_if_necessary(self, cur_row_idx, system):
+        # Do a swap if necessary...
+        for cur_col_idx in range(0, system.dimension):
+            cur_row_col_val = system.planes[cur_row_idx].normal_vector[cur_col_idx]
+            if cur_row_col_val == 0:
+                for potential_swap_idx in range(cur_row_idx + 1, len(system.planes)):
+                    potential_row_col_val = system.planes[potential_swap_idx].normal_vector[cur_col_idx]
+                    if potential_row_col_val != 0:
+                        system.swap_rows(cur_row_idx, potential_swap_idx)
+                        return
+            else:
+                return
+
 
     def indices_of_first_nonzero_terms_in_each_row(self):
         num_equations = len(self)

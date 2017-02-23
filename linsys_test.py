@@ -23,18 +23,18 @@ s.swap_rows(3,1)
 if not (s[0] == p1 and s[1] == p0 and s[2] == p2 and s[3] == p3):
     print('test case 3 failed')
 
-print('linear system is now: ', s)
+# print('linear system is now: ', s)
 
 s.multiply_coefficient_and_row(1,0)
-if not (s[0] == p1 and s[1] == p0 and s[2] == p2 and s[3] == p3):
-    print('test case 4 failed')
+# if not (s[0] == p1 and s[1] == p0 and s[2] == p2 and s[3] == p3):
+    # print('test case 4 failed')
 
 s.multiply_coefficient_and_row(-2,2)
-print('After test case 5:')
-print('   s[2]: ]', s[2])
-print('   times -1 should be: ', Plane(normal_vector=Vector(['-2','-2','2']), constant_term='-6'))
-print('   s[2].normal_vector[0]: ', s[2].normal_vector[0])
-print('   s[2].basepoint: ', s[2].basepoint)
+# print('After test case 5:')
+# print('   s[2]: ]', s[2])
+# print('   times -1 should be: ', Plane(normal_vector=Vector(['-2','-2','2']), constant_term='-6'))
+# print('   s[2].normal_vector[0]: ', s[2].normal_vector[0])
+# print('   s[2].basepoint: ', s[2].basepoint)
 if not (s[0] == p1 and
         s[1] == p0 and
         s[2] == Plane(normal_vector=Vector(['-2','-2','2']), constant_term='-6') and
@@ -57,7 +57,7 @@ if not (s[0] == p1 and
         s[3] == p3):
     print('test case 7 failed')
 
-print('linear system before case 8:', s)
+# print('linear system before case 8:', s)
 s.add_multiple_times_row_to_row(1,0,1)
 if not (s[0] == p1 and
         s[1] == Plane(normal_vector=Vector(['10','11','10']), constant_term='12') and
@@ -71,3 +71,78 @@ if not (s[0] == Plane(normal_vector=Vector(['-10','-10','-10']), constant_term='
         s[2] == Plane(normal_vector=Vector(['-1','-1','1']), constant_term='-3') and
         s[3] == p3):
     print('test case 9 failed')
+
+
+######################################## Triangular for tests ##################################
+
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['0','1','1']), constant_term='2')
+s = LinearSystem([p1,p2])
+t = s.compute_triangular_form()
+if not (t[0] == p1 and
+        t[1] == p2):
+    print('test case 1 failed')
+
+p1 = Plane(normal_vector=Vector(['0','0','3']), constant_term='3')
+p2 = Plane(normal_vector=Vector(['0','2','2']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+s = LinearSystem([p1,p2,p3])
+t = s.compute_triangular_form()
+# print(t)
+if not (t[0] == p3 and
+        t[1] == p2 and
+        t[2] == p1):
+    print('test case 1.1 failed')
+
+# p1 = Plane(normal_vector=Vector(['0','0','3']), constant_term='3')
+# p2 = Plane(normal_vector=Vector(['0','2','2']), constant_term='2')
+# p3 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
+# s = LinearSystem([p1,p2,p3])
+# t = s.compute_triangular_form()
+# if not (t[0] == p3 and
+#         t[1] == p2 and
+#         t[2] == p1):
+#     print('test case 1.2 failed')
+
+# p1 = Plane(normal_vector=Vector(['0','0','3']), constant_term='3')
+# p2 = Plane(normal_vector=Vector(['0','2','2']), constant_term='2')
+# p3 = Plane(normal_vector=Vector(['0','0','1']), constant_term='1')
+# s = LinearSystem([p1,p2,p3])
+# print('1.3')
+# t = s.compute_triangular_form()
+# print(t)
+# if not (t[0] == p2 and
+#         t[1] == p1 and
+#         t[2] == p3):
+#     print('test case 1.3 failed')
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['1','1','1']), constant_term='2')
+s = LinearSystem([p1,p2])
+t = s.compute_triangular_form()
+if not (t[0] == p1 and
+        t[1] == Plane(constant_term='1')):
+    print('test case 2 failed')
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
+p4 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
+s = LinearSystem([p1,p2,p3,p4])
+t = s.compute_triangular_form()
+if not (t[0] == p1 and
+        t[1] == p2 and
+        t[2] == Plane(normal_vector=Vector(['0','0','-2']), constant_term='2') and
+        t[3] == Plane()):
+    print('test case 3 failed')
+
+p1 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['1','-1','1']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','2','-5']), constant_term='3')
+s = LinearSystem([p1,p2,p3])
+t = s.compute_triangular_form()
+if not (t[0] == Plane(normal_vector=Vector(['1','-1','1']), constant_term='2') and
+        t[1] == Plane(normal_vector=Vector(['0','1','1']), constant_term='1') and
+        t[2] == Plane(normal_vector=Vector(['0','0','-9']), constant_term='-2')):
+    print('test case 4 failed')
