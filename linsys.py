@@ -25,14 +25,11 @@ class LinearSystem(object):
         except AssertionError:
             raise Exception(self.ALL_PLANES_MUST_BE_IN_SAME_DIM_MSG)
 
-
     def swap_rows(self, row1, row2):
         self[row1], self[row2] = self[row2], self[row1]
 
-
     def multiply_coefficient_and_row(self, coefficient, row):
         self[row] = Plane(self[row].normal_vector * coefficient, self[row].constant_term * coefficient)
-
 
     def add_multiple_times_row_to_row(self, coefficient, row_to_add, row_to_be_added_to):
         plane_times_coef = Plane(self[row_to_add].normal_vector * coefficient, self[row_to_add].constant_term * coefficient)
@@ -42,14 +39,6 @@ class LinearSystem(object):
 
     def compute_triangular_form(self):
         system = deepcopy(self)
-        # cur_col_idx = 0
-        # for cur_row_idx in range(0, len(system.planes)):
-        #     cur_row_col_val = system.planes[cur_row_idx].normal_vector[cur_col_idx]
-        #     if cur_row_col_val == 0:
-        #         for potential_swap_idx in range(cur_row_idx+1, len(system.planes)):
-        #             potential_row_col_val = system.planes[potential_swap_idx].normal_vector[cur_col_idx]
-        #             if potential_row_col_val != 0:
-        #                 system.swap_rows(cur_row_idx, potential_swap_idx)
         for cur_row_idx in range(0, len(system.planes)):
             self.swap_if_necessary(cur_row_idx, system)
 
@@ -58,29 +47,26 @@ class LinearSystem(object):
 
             # Do row subtractions
             first_nonzero_col = Plane.first_nonzero_index(system.planes[cur_row_idx].normal_vector)
-            # print(cur_row_idx, ': ', first_nonzero_col)
             for below_row in range(cur_row_idx+1, len(system.planes)):
                 a = system.planes[cur_row_idx].normal_vector[first_nonzero_col]
                 b = system.planes[below_row].normal_vector[first_nonzero_col]
                 coef = -b/a
                 system.add_multiple_times_row_to_row(coef, cur_row_idx, below_row)
-
-
         return system
 
-    def swap_if_necessary(self, cur_row_idx, system):
+    @staticmethod
+    def swap_if_necessary(cur_row_idx, system):
         # Do a swap if necessary...
         for cur_col_idx in range(0, system.dimension):
             cur_row_col_val = system.planes[cur_row_idx].normal_vector[cur_col_idx]
-            if cur_row_col_val == 0:
+            if not MyDecimal(cur_row_col_val).is_near_zero():
+                return
+            else:
                 for potential_swap_idx in range(cur_row_idx + 1, len(system.planes)):
                     potential_row_col_val = system.planes[potential_swap_idx].normal_vector[cur_col_idx]
-                    if potential_row_col_val != 0:
+                    if not MyDecimal(potential_row_col_val).is_near_zero():
                         system.swap_rows(cur_row_idx, potential_swap_idx)
                         return
-            else:
-                return
-
 
     def indices_of_first_nonzero_terms_in_each_row(self):
         num_equations = len(self)
