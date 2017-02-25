@@ -18,8 +18,8 @@ class Plane(object):
         self.normal_vector = normal_vector
 
         if not constant_term:
-            constant_term = Decimal('0')
-        self.constant_term = Decimal(constant_term)
+            constant_term = MyDecimal('0')
+        self.constant_term = MyDecimal(constant_term)
 
         self.set_basepoint()
 

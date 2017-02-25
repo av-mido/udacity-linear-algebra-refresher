@@ -92,7 +92,42 @@ class LinearSystem(object):
             tf.clear_above_rows(row_idx, idx_of_first_nonzero_term)
         return tf
 
+    def compute_gaussian_elimination(self):
+        rref = self.compute_rref()
+        rref.raise_exception_if_contradictory_equation()
+        rref.raise_exception_if_too_few_pivots()
+        solution_coords = [rref.planes[i].constant_term for i in range(rref.dimension)]
+        return Vector(solution_coords)
 
+        #
+        # pivot_indices = rref.indices_of_first_nonzero_terms_in_each_row()
+        # xyz_values = [None] * rref.dimension
+        # j = rref.dimension - 1
+        # for row_idx in range(len(rref.planes)-1, -1, -1):
+        #     idx_of_first_nonzero_term = pivot_indices[row_idx]
+        #     if rref[row_idx].normal_vector[idx_of_first_nonzero_term] == -1 and not rref[row_idx].constant_term.is_near_zero():
+        #         raise Exception("No Solution")
+        #     if idx_of_first_nonzero_term == j:
+
+    def raise_exception_if_contradictory_equation(self):
+        pivot_indices = self.indices_of_first_nonzero_terms_in_each_row()
+        for row_idx in range(0, len(self.planes)):
+            idx_of_first_nonzero_term = pivot_indices[row_idx]
+            if idx_of_first_nonzero_term == -1 and not self.planes[row_idx].constant_term.is_near_zero():
+                raise Exception(self.NO_SOLUTIONS_MSG)
+
+    def raise_exception_if_too_few_pivots(self):
+        # col = 0
+        # for row_idx in range(0, self.planes):
+        #     if col >= self.dimension:
+        #         return
+        #     if self.planes[row_idx].normal_vector[col].is_near_zero():
+        #         raise Exception("Infinite solutions")
+        #     col += 1
+        pivot_indices = self.indices_of_first_nonzero_terms_in_each_row()
+        num_pivots = sum([1 if index >= 0 else 0 for index in pivot_indices])
+        if num_pivots < self.dimension:
+            raise Exception(self.INF_SOLUTIONS_MSG)
 
 
     def indices_of_first_nonzero_terms_in_each_row(self):
