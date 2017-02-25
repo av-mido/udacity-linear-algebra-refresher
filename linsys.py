@@ -68,6 +68,11 @@ class LinearSystem(object):
                         system.swap_rows(cur_row_idx, potential_swap_idx)
                         return
 
+    def compute_rref(self):
+        tf = self.compute_triangular_form()
+        #todo
+        return tf
+
     def indices_of_first_nonzero_terms_in_each_row(self):
         num_equations = len(self)
         num_variables = self.dimension
