@@ -47,12 +47,23 @@ class LinearSystem(object):
 
             # Do row subtractions
             first_nonzero_col = Plane.first_nonzero_index(system.planes[cur_row_idx].normal_vector)
-            for below_row in range(cur_row_idx+1, len(system.planes)):
-                a = system.planes[cur_row_idx].normal_vector[first_nonzero_col]
-                b = system.planes[below_row].normal_vector[first_nonzero_col]
-                coef = -b/a
-                system.add_multiple_times_row_to_row(coef, cur_row_idx, below_row)
+            system.clear_below_rows(cur_row_idx, first_nonzero_col)
         return system
+
+    def clear_below_rows(self, cur_row_idx, first_nonzero_col):
+        for below_row in range(cur_row_idx + 1, len(self.planes)):
+            a = self.planes[cur_row_idx].normal_vector[first_nonzero_col]
+            b = self.planes[below_row].normal_vector[first_nonzero_col]
+            coef = -b / a
+            self.add_multiple_times_row_to_row(coef, cur_row_idx, below_row)
+
+    def clear_above_rows(self, cur_row_idx, idx_of_first_nonzero_term):
+        for above_row in range(cur_row_idx-1, -1, -1):
+            # 'a' should be zero here
+            a = self.planes[cur_row_idx].normal_vector[idx_of_first_nonzero_term]
+            b = self.planes[above_row].normal_vector[idx_of_first_nonzero_term]
+            coef = - b / a
+            self.add_multiple_times_row_to_row(coef, cur_row_idx, above_row)
 
     @staticmethod
     def swap_if_necessary(cur_row_idx, system):
@@ -70,8 +81,19 @@ class LinearSystem(object):
 
     def compute_rref(self):
         tf = self.compute_triangular_form()
-        #todo
+        pivot_indices = tf.indices_of_first_nonzero_terms_in_each_row()
+        for row_idx in range(len(tf.planes)-1, -1, -1):
+            idx_of_first_nonzero_term = pivot_indices[row_idx]
+            if idx_of_first_nonzero_term < 0:
+                continue
+            first_nonzero_term = tf.planes[row_idx].normal_vector[idx_of_first_nonzero_term]
+            if not (0.9999 < first_nonzero_term < 1.0001):
+                tf.multiply_coefficient_and_row(Decimal(1)/first_nonzero_term, row_idx)
+            tf.clear_above_rows(row_idx, idx_of_first_nonzero_term)
         return tf
+
+
+
 
     def indices_of_first_nonzero_terms_in_each_row(self):
         num_equations = len(self)
@@ -113,6 +135,7 @@ class LinearSystem(object):
         temp = ['Equation {}: {}'.format(i+1,p) for i,p in enumerate(self.planes)]
         ret += '\n'.join(temp)
         return ret
+
 
 
 class MyDecimal(Decimal):
