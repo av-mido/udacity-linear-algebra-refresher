@@ -227,3 +227,36 @@ try:
         print('failed GE test 3')
 except Exception as e:
     print('failed GE test 3')
+
+
+##################################### Quiz: Coding Parametrization ###########################
+# Hooray all of these pass.
+# See https://classroom.udacity.com/courses/ud953/lessons/4624329808/concepts/48972686550923#
+# TODO: turn these into unit tests.
+
+# Fixed equation from github -
+p1 = Plane(Vector([0.786, 0.786, 0.588]), -0.714)
+p2 = Plane(Vector([-0.131, -0.131, 0.244]), 0.319)
+s = LinearSystem([p1, p2])
+param_version = s.compute_gaussian_elimination(True)
+print("\nparam test 1:")
+print(param_version)
+
+p1 = Plane(Vector([8.631, 5.112, -1.816]), -5.113)
+p2 = Plane(Vector([4.315, 11.132, -5.27]), -6.775)
+p3 = Plane(Vector([-2.158, 3.01, -1.727]), -0.831)
+s = LinearSystem([p1, p2, p3])
+param_version = s.compute_gaussian_elimination(True)
+print("\nparam test 2:")
+print(param_version)
+
+p1 = Plane(Vector([0.935, 1.76, -9.365]), -9.955)
+p2 = Plane(Vector([0.187, 0.352, -1.873]), -1.991)
+p3 = Plane(Vector([0.374, 0.704, -3.746]), -3.982)
+p4 = Plane(Vector([-0.561, -1.056, 5.619]), 5.973)
+s = LinearSystem([p1, p2, p3, p4])
+param_version = s.compute_gaussian_elimination(True)
+print("\nparam test 3:")
+print(param_version)
+
+######################

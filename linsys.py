@@ -1,6 +1,8 @@
 from decimal import Decimal, getcontext
 from copy import deepcopy
 
+import math
+
 from vector import Vector
 from plane import Plane
 
@@ -92,22 +94,19 @@ class LinearSystem(object):
             tf.clear_above_rows(row_idx, idx_of_first_nonzero_term)
         return tf
 
-    def compute_gaussian_elimination(self):
+    def compute_gaussian_elimination(self, parametrize=False):
         rref = self.compute_rref()
         rref.raise_exception_if_contradictory_equation()
-        rref.raise_exception_if_too_few_pivots()
+        try:
+            rref.raise_exception_if_too_few_pivots()
+        except Exception as e:
+            if parametrize and str(e) == self.INF_SOLUTIONS_MSG:
+                return rref.get_parametrization_if_too_few_pivots()
+            else:
+                raise
+
         solution_coords = [rref.planes[i].constant_term for i in range(rref.dimension)]
         return Vector(solution_coords)
-
-        #
-        # pivot_indices = rref.indices_of_first_nonzero_terms_in_each_row()
-        # xyz_values = [None] * rref.dimension
-        # j = rref.dimension - 1
-        # for row_idx in range(len(rref.planes)-1, -1, -1):
-        #     idx_of_first_nonzero_term = pivot_indices[row_idx]
-        #     if rref[row_idx].normal_vector[idx_of_first_nonzero_term] == -1 and not rref[row_idx].constant_term.is_near_zero():
-        #         raise Exception("No Solution")
-        #     if idx_of_first_nonzero_term == j:
 
     def raise_exception_if_contradictory_equation(self):
         pivot_indices = self.indices_of_first_nonzero_terms_in_each_row()
@@ -129,6 +128,27 @@ class LinearSystem(object):
         if num_pivots < self.dimension:
             raise Exception(self.INF_SOLUTIONS_MSG)
 
+    def get_parametrization_if_too_few_pivots(self):
+        # self is already an rref, and has infinitely many solutions.
+        pivot_indices = self.indices_of_first_nonzero_terms_in_each_row()
+        direction_vectors = []
+        for col in range(0, self.dimension):
+            if col in pivot_indices:
+                direction_vectors += [Vector([0] * self.dimension)]
+            else:
+                vector_coords = [0] * self.dimension
+                # cur_dim is a row
+                for cur_dim in range(0, len(self.planes)): # min(col + 1, len(self.planes))):
+                    if pivot_indices[cur_dim] < col and pivot_indices[cur_dim] != -1:
+                        vector_coords[cur_dim] = - self.planes[cur_dim].normal_vector[col]
+                    elif cur_dim == col:
+                        vector_coords[cur_dim] = 1
+                direction_vectors += [Vector(vector_coords)]
+        param_basepoint = [0] * self.dimension
+        for row, pivot_col in enumerate(pivot_indices):
+            param_basepoint[pivot_col] = self.planes[row].constant_term
+        return Parametrization(Vector(param_basepoint), direction_vectors)
+
 
     def indices_of_first_nonzero_terms_in_each_row(self):
         num_equations = len(self)
@@ -146,6 +166,7 @@ class LinearSystem(object):
                     raise e
 
         return indices
+
 
 
     def __len__(self):
@@ -176,6 +197,30 @@ class LinearSystem(object):
 class MyDecimal(Decimal):
     def is_near_zero(self, eps=1e-10):
         return abs(self) < eps
+
+class Parametrization(object):
+    BASEPT_AND_DIR_VECTORS_MUST_BE_IN_SAME_DIM_MSG = (
+        'The basepoint and direction vectors should all be in the same dimension.'
+    )
+
+    def __init__(self, basepoint, direction_vectors):
+        self.basepoint = basepoint
+        self.direction_vectors = direction_vectors
+        self.dimension = self.basepoint.dimension
+
+        try:
+            for v in direction_vectors:
+                assert v.dimension == self.dimension
+        except AssertionError:
+            raise Exception(self.BASEPT_AND_DIR_VECTORS_MUST_BE_IN_SAME_DIM_MSG)
+
+    def __str__(self):
+        ret = 'Parametrization:\n'
+        temp = ['Direction Vectors {}: {}'.format(i + 1, p) for i, p in enumerate(self.direction_vectors)]
+        basept = 'Basepoint: {}'.format(self.basepoint)
+        ret += '\n'.join(temp)
+        ret += '\n' + basept
+        return ret
 
 
 # p0 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
