@@ -3,14 +3,6 @@ from vector import Vector
 from linsys import LinearSystem
 from decimal import Decimal
 
-
-# def setup_first_system():
-#     p0 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
-#     p1 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
-#     p2 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
-#     p3 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
-#     s = LinearSystem([p0, p1, p2, p3])
-
 def test_case_1():
     p0 = Plane(normal_vector=Vector(['1', '1', '1']), constant_term='1')
     p1 = Plane(normal_vector=Vector(['0', '1', '0']), constant_term='2')
@@ -214,82 +206,94 @@ def test_triangular_4():
 
 
 ############################# Quiz: Coding RREF #################################
-p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
-p2 = Plane(normal_vector=Vector(['0','1','1']), constant_term='2')
-s = LinearSystem([p1,p2])
-r = s.compute_rref()
-if not (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term='-1') and
-        r[1] == p2):
-    print('rref test case 1 failed')
+def test_rref_1():
+    p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+    p2 = Plane(normal_vector=Vector(['0','1','1']), constant_term='2')
+    s = LinearSystem([p1,p2])
+    r = s.compute_rref()
+    assert (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term='-1') and
+            r[1] == p2)
+        # print('rref test case 1 failed')
 
-p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
-p2 = Plane(normal_vector=Vector(['1','1','1']), constant_term='2')
-s = LinearSystem([p1,p2])
-r = s.compute_rref()
-if not (r[0] == p1 and
-        r[1] == Plane(constant_term='1')):
-    print('rref test case 2 failed')
+def test_rref_2():
+    p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+    p2 = Plane(normal_vector=Vector(['1','1','1']), constant_term='2')
+    s = LinearSystem([p1,p2])
+    r = s.compute_rref()
+    assert (r[0] == p1 and
+            r[1] == Plane(constant_term='1'))
+        # print('rref test case 2 failed')
 
-p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
-p2 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
-p3 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
-p4 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
-s = LinearSystem([p1,p2,p3,p4])
-r = s.compute_rref()
-if not (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term='0') and
-        r[1] == p2 and
-        r[2] == Plane(normal_vector=Vector(['0','0','-2']), constant_term='2') and
-        r[3] == Plane()):
-    print('rref test case 3 failed')
+def test_rref_3():
+    p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+    p2 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
+    p3 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
+    p4 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
+    s = LinearSystem([p1,p2,p3,p4])
+    r = s.compute_rref()
+    assert (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term='0') and
+            r[1] == p2 and
+            r[2] == Plane(normal_vector=Vector(['0','0','-2']), constant_term='2') and
+            r[3] == Plane())
+        # print('rref test case 3 failed')
 
-p1 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
-p2 = Plane(normal_vector=Vector(['1','-1','1']), constant_term='2')
-p3 = Plane(normal_vector=Vector(['1','2','-5']), constant_term='3')
-s = LinearSystem([p1,p2,p3])
-r = s.compute_rref()
-if not (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term=Decimal('23')/Decimal('9')) and
-        r[1] == Plane(normal_vector=Vector(['0','1','0']), constant_term=Decimal('7')/Decimal('9')) and
-        r[2] == Plane(normal_vector=Vector(['0','0','1']), constant_term=Decimal('2')/Decimal('9'))):
-    print('rref test case 4 failed')
+def test_rref_4():
+    p1 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
+    p2 = Plane(normal_vector=Vector(['1','-1','1']), constant_term='2')
+    p3 = Plane(normal_vector=Vector(['1','2','-5']), constant_term='3')
+    s = LinearSystem([p1,p2,p3])
+    r = s.compute_rref()
+    assert (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term=Decimal('23')/Decimal('9')) and
+            r[1] == Plane(normal_vector=Vector(['0','1','0']), constant_term=Decimal('7')/Decimal('9')) and
+            r[2] == Plane(normal_vector=Vector(['0','0','1']), constant_term=Decimal('2')/Decimal('9')))
+        # print('rref test case 4 failed')
 
 
 #################################### Quiz: Coding GE Solution ################
-p1 = Plane(normal_vector=Vector(['5.862','1.178','-10.366']), constant_term='-8.15')
-p2 = Plane(normal_vector=Vector(['-2.931','-0.589','5.183']), constant_term='-4.075')
-s = LinearSystem([p1, p2])
-try:
-    ge = s.compute_gaussian_elimination()
-    print('failed GE test 1')
-except Exception as e:
-    if str(e) == LinearSystem.NO_SOLUTIONS_MSG:
-        pass # print('passed GE test 1')
-    else:
+def test_ge_1():
+    p1 = Plane(normal_vector=Vector(['5.862','1.178','-10.366']), constant_term='-8.15')
+    p2 = Plane(normal_vector=Vector(['-2.931','-0.589','5.183']), constant_term='-4.075')
+    s = LinearSystem([p1, p2])
+    try:
+        ge = s.compute_gaussian_elimination()
         print('failed GE test 1')
+        assert False
+    except Exception as e:
+        if str(e) == LinearSystem.NO_SOLUTIONS_MSG:
+            pass # print('passed GE test 1')
+        else:
+            print('failed GE test 1')
+            assert False
 
-p1 = Plane(normal_vector=Vector(['8.631','5.112','-1.816']), constant_term='-5.113')
-p2 = Plane(normal_vector=Vector(['4.315','11.132','-5.27']), constant_term='-6.775')
-p3 = Plane(normal_vector=Vector(['-2.158','3.01','-1.727']), constant_term='-0.831')
-s = LinearSystem([p1, p2, p3])
-try:
-    ge = s.compute_gaussian_elimination()
-    print('failed GE test 2')
-except Exception as e:
-    if str(e) == LinearSystem.INF_SOLUTIONS_MSG:
-        pass # print('passed GE test 2')
-    else:
+def test_ge_2():
+    p1 = Plane(normal_vector=Vector(['8.631','5.112','-1.816']), constant_term='-5.113')
+    p2 = Plane(normal_vector=Vector(['4.315','11.132','-5.27']), constant_term='-6.775')
+    p3 = Plane(normal_vector=Vector(['-2.158','3.01','-1.727']), constant_term='-0.831')
+    s = LinearSystem([p1, p2, p3])
+    try:
+        ge = s.compute_gaussian_elimination()
         print('failed GE test 2')
+        assert False
+    except Exception as e:
+        if str(e) == LinearSystem.INF_SOLUTIONS_MSG:
+            pass # print('passed GE test 2')
+        else:
+            print('failed GE test 2')
+            assert False
 
-p1 = Plane(Vector([5.262, 2.739, -9.878]), -3.441)
-p2 = Plane(Vector([5.111, 6.358, 7.638]), -2.152)
-p3 = Plane(Vector([2.016, -9.924, -1.367]), -9.278)
-p4 = Plane(Vector([2.167, -13.543, -18.883]), -10.567)
-s = LinearSystem([p1, p2, p3, p4])
-try:
-    ge = s.compute_gaussian_elimination()
-    if not ge == Vector([Decimal('-1.17720187578995858313947665146'), Decimal('0.707150558138740933006474968216'), Decimal('-0.0826635849022828890650647196936')]):
+def test_ge_3():
+    p1 = Plane(Vector([5.262, 2.739, -9.878]), -3.441)
+    p2 = Plane(Vector([5.111, 6.358, 7.638]), -2.152)
+    p3 = Plane(Vector([2.016, -9.924, -1.367]), -9.278)
+    p4 = Plane(Vector([2.167, -13.543, -18.883]), -10.567)
+    s = LinearSystem([p1, p2, p3, p4])
+    try:
+        ge = s.compute_gaussian_elimination()
+        assert ge == Vector([Decimal('-1.17720187578995858313947665146'), Decimal('0.707150558138740933006474968216'), Decimal('-0.0826635849022828890650647196936')])
+            # print('failed GE test 3')
+    except Exception as e:
         print('failed GE test 3')
-except Exception as e:
-    print('failed GE test 3')
+        assert False
 
 
 ##################################### Quiz: Coding Parametrization ###########################
